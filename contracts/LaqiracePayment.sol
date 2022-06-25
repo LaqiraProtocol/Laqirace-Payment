@@ -49,6 +49,15 @@ contract LaqiracePayment is Ownable {
         return nativeCurrencyPermit;
     }
 
+    function setPaymentReceiver(address _paymentReceiver) public onlyOwner returns (bool) {
+        paymentReceiver = _paymentReceiver;
+        return true;
+    }
+
+    function getPaymentReceiver() public view returns (address) {
+        return paymentReceiver;
+    }
+
 
     function checkQuoteToken(address _quoteToken) public view returns (bool) {
         return quoteToken[_quoteToken];
