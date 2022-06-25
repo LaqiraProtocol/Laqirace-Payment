@@ -5,6 +5,18 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 
 import './TransferHelper.sol';
 
+interface IBEP20 {
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `recipient`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+
+    function transfer(address recipient, uint256 amount) external returns (bool);
+}
+
 contract LaqiracePayment is Ownable {
     mapping(address => bool) private quoteToken;
 
@@ -56,6 +68,16 @@ contract LaqiracePayment is Ownable {
 
     function getPaymentReceiver() public view returns (address) {
         return paymentReceiver;
+    }
+
+    function transferAnyBEP20(address _tokenAddress, address _to, uint256 _amount) public virtual onlyOwner returns (bool) {
+        IBEP20(_tokenAddress).transfer(_to, _amount);
+        return true;
+    }
+
+    function adminWithdrawal(uint256 _amount) public virtual onlyOwner {
+        address payable _owner = payable(owner());
+        _owner.transfer(_amount);
     }
 
 
