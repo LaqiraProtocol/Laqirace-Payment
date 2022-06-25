@@ -48,7 +48,7 @@ contract LaqiracePayment is Ownable {
     }
 
     function addQuoteToken(address _quoteToken) public onlyOwner returns (bool) {
-        qouteToken[_quoteToken] = true;
+        quoteToken[_quoteToken] = true;
         return true;
     }
 
