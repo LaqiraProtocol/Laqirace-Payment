@@ -88,4 +88,8 @@ contract LaqiracePayment is Ownable {
     function checkQuoteToken(address _quoteToken) public view returns (bool, uint256) {
         return (quoteToken[_quoteToken].isAvailable, quoteToken[_quoteToken].minAmount);
     }
+    
+    function getPendingReqs() public view returns (uint256[] memory) {
+        return pendingReqs;
+    }
 }
