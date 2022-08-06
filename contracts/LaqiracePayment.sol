@@ -90,6 +90,7 @@ contract LaqiracePayment is Ownable {
         withdrawReqs[_reqNo].isPending = false;
         delUintFromArray(_reqNo, pendingReqs);
         emit RequestConfirmed(withdrawReqs[_reqNo].player, withdrawReqs[_reqNo].quoteToken, withdrawReqs[_reqNo].amount, _reqNo);
+        return true;
     }
 
     function addQuoteToken(address _quoteToken, uint256 _minAmount) public onlyOwner returns (bool) {
