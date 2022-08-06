@@ -61,7 +61,19 @@ contract LaqiracePayment is Ownable {
     }
 
     function addQuoteToken(address _quoteToken, uint256 _minAmount) public onlyOwner returns (bool) {
+        require(!quoteToken[_quoteToken].isAvailable, 'Asset already exists');
         quoteToken[_quoteToken].isAvailable = true;
+        quoteToken[_quoteToken].minAmount = _minAmount;
+        return true;
+    }
+    
+    function removeQuoteToken(address _quoteToken) public onlyOwner returns (bool) {
+        require(quoteToken[_quoteToken].isAvailable, 'Asset already does not exist');
+        delete quoteToken(_quoteToken);
+        return true;
+    }
+    
+    function updateMinAmount(address _quoteToken, uint256 _minAmount) public onlyOwner returns (bool) {
         quoteToken[_quoteToken].minAmount = _minAmount;
         return true;
     }
