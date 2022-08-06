@@ -43,12 +43,8 @@ contract LaqiracePayment is Ownable {
         emit DepositToken(_player, _quoteToken, _amount);
     }
 
-    function withdrawTokenRequest(address _quoteToken, uint256 _amount) public {
+    function withdrawRequest(address _quoteToken, uint256 _amount) public {
         emit WithdrawTokenRequest(_msgSender(), _quoteToken, _amount);
-    }
-
-    function withdrawNativeRequest(uint256 _amount) public {
-        emit WithdrawNativeRequest(_msgSender(), 'BNB', _amount);
     }
 
     function addQuoteToken(address _quoteToken) public onlyOwner returns (bool) {
