@@ -22,9 +22,16 @@ contract LaqiracePayment is Ownable {
         bool isAvailable;
         uint256 minAmount;
     }
+    
+    struct reqStatus {
+        bool isPending;
+        address player;
+        address quoteToken;
+        uint256 amount;
+    }
 
     mapping(address => assetStatus) private quoteToken;
-    mapping(uint256 => bool) private pendingRequests;
+    mapping(uint256 => reqStatus) private withdrawReqs;
 
     address private paymentReceiver;
     uint256 private reqCounter;
@@ -54,7 +61,10 @@ contract LaqiracePayment is Ownable {
         require(quoteToken[_quoteToken].isAvailable, 'Asset is not allowed');
         require(_amount >= quoteToken[_quoteToken].minAmount, 'Amount is lower than minimum required');
         reqCounter++;
-        pendingRequests[reqCounter] = true;
+        withdrawReqs[reqCounter].isPending = true;
+        withdrawReqs[reqCounter].player = _msgSender();
+        withdrawReqs[reqCounter].quoteToken = _quoteToken;
+        withdrawReqs[reqCounter].amount = _amount;
         pendingReqs.push(reqCounter);
         emit WithdrawRequest(_msgSender(), _quoteToken, _amount, reqCounter);
         return true;
