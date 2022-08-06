@@ -159,6 +159,10 @@ contract LaqiracePayment is Ownable {
         return pendingReqs;
     }
     
+    function getReqStatus(uint256 _reqNo) public view returns (reqStatus memory) {
+        return withdrawRequests[_reqNo];
+    }
+    
     function getReqFee() public view returns (uint256) {
         return reqFee;
     }
