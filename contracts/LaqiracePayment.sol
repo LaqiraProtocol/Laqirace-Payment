@@ -159,7 +159,7 @@ contract LaqiracePayment is Ownable {
     function delUintFromArray(
         uint256 _element,
         uint256[] storage array
-    ) internal virtual {
+    ) private virtual {
         // delete the element
         uint256 len = array.length;
         uint256 j = 0;
