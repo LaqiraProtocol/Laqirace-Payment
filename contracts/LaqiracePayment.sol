@@ -19,11 +19,14 @@ interface IBEP20 {
 
 contract LaqiracePayment is Ownable {
     mapping(address => bool) private quoteToken;
+    mapping(uint256 => bool) private pendingRequests;
 
     address private paymentReceiver;
+    uint256 private reqCounter;
+    uint256[] private pendingReqs;
 
     event DepositToken(address player, address quoteToken, uint256 amount);
-    event WithdrawRequest(address player, address quoteToken, uint256 amount);
+    event WithdrawRequest(address player, address quoteToken, uint256 amount, uint256 reqCounter);
 
     function deposit(address _quoteToken, address _player, uint256 _amount) public payable returns (bool) {
         require(quoteToken[_quoteToken], 'Payment method is not allowed');
@@ -43,7 +46,10 @@ contract LaqiracePayment is Ownable {
     }
 
     function withdrawRequest(address _quoteToken, uint256 _amount) public returns (bool) {
-        emit WithdrawRequest(_msgSender(), _quoteToken, _amount);
+        reqCounter++;
+        pendingRequests[reqCounter] = true;
+        pendingReqs.push(reqCounter);
+        emit WithdrawRequest(_msgSender(), _quoteToken, _amount, reqCounter);
         return true;
     }
 
