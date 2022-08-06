@@ -41,6 +41,7 @@ contract LaqiracePayment is Ownable {
 
     event DepositToken(address player, address quoteToken, uint256 amount);
     event WithdrawRequest(address player, address quoteToken, uint256 amount, uint256 reqCounter);
+    event RequestConfirmed(address player, address quoteToken, uint256 amount, uint256 reqCounter);
 
     function deposit(address _quoteToken, address _player, uint256 _amount) public payable returns (bool) {
         require(quoteToken[_quoteToken].isAvailable, 'Payment method is not allowed');
@@ -76,6 +77,19 @@ contract LaqiracePayment is Ownable {
         pendingReqs.push(reqCounter);
         emit WithdrawRequest(_msgSender(), _quoteToken, _amount, reqCounter);
         return true;
+    }
+    
+    function confirmRequest(uint256 _reqNo) public returns (bool) {
+        require(_msgSender() == operator || _msgSender() == owner(), 'Permission denied!');
+        address asset = withdrawReqs[_reqNo].quoteToken;
+        if (asset == TransferHelper.ETH_ADDRESS) {
+            TransferHelper.safeTransferETH(withdrawReqs[_reqNo].player, withdrawReqs[_reqNo].amount);
+        } else {
+            TransferHelper.safeTransfer(withdrawReqs[_reqNo].quoteToken, withdrawReqs[_reqNo].player, withdrawReqs[_reqNo].amount);
+        }
+        withdrawReqs[_reqNo].isPending = false;
+        delUintFromArray(_reqNo, pendingReqs);
+        emit RequestConfirmed(withdrawReqs[_reqNo].player, withdrawReqs[_reqNo].quoteToken, withdrawReqs[_reqNo].amount, _reqNo);
     }
 
     function addQuoteToken(address _quoteToken, uint256 _minAmount) public onlyOwner returns (bool) {
@@ -139,5 +153,24 @@ contract LaqiracePayment is Ownable {
     
     function getOperator() public view returns (address) {
         return operator;
+    }
+    
+    function delUintFromArray(
+        uint256 _element,
+        uint256[] storage array
+    ) internal virtual {
+        // delete the element
+        uint256 len = array.length;
+        uint256 j = 0;
+        for (uint256 i = 0; i <= len - 1; i++) {
+            if (array[i] == _element) {
+                j = i;
+                break;
+            }
+        }
+        for (j; j < len - 1; j++) {
+            array[j] = array[j + 1];
+        }
+        array.pop();
     }
 }
