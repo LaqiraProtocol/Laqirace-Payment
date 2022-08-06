@@ -43,6 +43,12 @@ contract LaqiracePayment is Ownable {
     event WithdrawRequest(address player, address quoteToken, uint256 amount, uint256 reqCounter);
     event RequestConfirmed(address player, address quoteToken, uint256 amount, uint256 reqCounter);
     event RequestRejected(address player, address quoteToken, uint256 amount, uint256 reqCounter);
+    
+    constructor(address _paymentReceiver, uint256 _reqFee, address _operator) {
+        paymentReceiver = _paymentReceiver;
+        reqFee = _reqFee;
+        operator = _operator;
+    }
 
     function deposit(address _quoteToken, address _player, uint256 _amount) public payable returns (bool) {
         require(quoteToken[_quoteToken].isAvailable, 'Payment method is not allowed');
