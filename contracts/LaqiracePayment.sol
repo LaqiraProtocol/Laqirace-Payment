@@ -46,6 +46,7 @@ contract LaqiracePayment is Ownable {
     }
 
     function withdrawRequest(address _quoteToken, uint256 _amount) public returns (bool) {
+        require(quoteToken[_quoteToken], 'Asset is not allowed');
         reqCounter++;
         pendingRequests[reqCounter] = true;
         pendingReqs.push(reqCounter);
