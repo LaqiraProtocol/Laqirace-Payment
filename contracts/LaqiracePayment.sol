@@ -36,6 +36,7 @@ contract LaqiracePayment is Ownable {
     address private paymentReceiver;
     uint256 private reqCounter;
     uint256[] private pendingReqs;
+    uint256 private reqFee;
 
     event DepositToken(address player, address quoteToken, uint256 amount);
     event WithdrawRequest(address player, address quoteToken, uint256 amount, uint256 reqCounter);
@@ -57,9 +58,15 @@ contract LaqiracePayment is Ownable {
         return true;
     }
 
-    function withdrawRequest(address _quoteToken, uint256 _amount) public returns (bool) {
+    function withdrawRequest(address _quoteToken, uint256 _amount) public payable returns (bool) {
         require(quoteToken[_quoteToken].isAvailable, 'Asset is not allowed');
         require(_amount >= quoteToken[_quoteToken].minAmount, 'Amount is lower than minimum required');
+        uint256 transferredAmount = msg.value;
+        require(transferredAmount >= reqFee, 'Insufficient request fee');
+        
+        uint256 diff = transferredAmount  - reqFee;
+        if (diff > 0)
+            TransferHelper.safeTransferETH(_msgSender(), diff);
         reqCounter++;
         withdrawReqs[reqCounter].isPending = true;
         withdrawReqs[reqCounter].player = _msgSender();
@@ -93,6 +100,11 @@ contract LaqiracePayment is Ownable {
         return true;
     }
     
+    function updateReqFee(uint256 _reqFee) public onlyOwner returns (bool) {
+        reqFee = _reqFee;
+        return true;
+    }
+    
     function transferAnyBEP20(address _tokenAddress, address _to, uint256 _amount) public virtual onlyOwner returns (bool) {
         IBEP20(_tokenAddress).transfer(_to, _amount);
         return true;
@@ -113,5 +125,9 @@ contract LaqiracePayment is Ownable {
     
     function getPendingReqs() public view returns (uint256[] memory) {
         return pendingReqs;
+    }
+    
+    fucntion getReqFee() public view returns (uint256) {
+        return reqFee;
     }
 }
