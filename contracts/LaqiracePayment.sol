@@ -35,7 +35,7 @@ contract LaqiracePayment is Ownable {
             if (diff > 0)
                 TransferHelper.safeTransferETH(_msgSender(), diff);
         } else {
-            require(transferredAmount = 0, 'Invalid payment method');
+            require(transferredAmount == 0, 'Invalid payment method');
             TransferHelper.safeTransferFrom(_quoteToken, _msgSender(), paymentReceiver, _amount);
         }
         emit DepositToken(_player, _quoteToken, _amount);
