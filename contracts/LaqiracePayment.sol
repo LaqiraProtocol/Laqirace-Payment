@@ -86,7 +86,7 @@ contract LaqiracePayment is Ownable {
     
     function removeQuoteToken(address _quoteToken) public onlyOwner returns (bool) {
         require(quoteToken[_quoteToken].isAvailable, 'Asset already does not exist');
-        delete quoteToken(_quoteToken);
+        delete quoteToken[_quoteToken];
         return true;
     }
     
@@ -127,7 +127,7 @@ contract LaqiracePayment is Ownable {
         return pendingReqs;
     }
     
-    fucntion getReqFee() public view returns (uint256) {
+    function getReqFee() public view returns (uint256) {
         return reqFee;
     }
 }
