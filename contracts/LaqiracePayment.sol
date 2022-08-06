@@ -37,6 +37,7 @@ contract LaqiracePayment is Ownable {
     uint256 private reqCounter;
     uint256[] private pendingReqs;
     uint256 private reqFee;
+    address private operator;
 
     event DepositToken(address player, address quoteToken, uint256 amount);
     event WithdrawRequest(address player, address quoteToken, uint256 amount, uint256 reqCounter);
@@ -105,6 +106,11 @@ contract LaqiracePayment is Ownable {
         return true;
     }
     
+    function changeOperator(address _newOperator) public onlyOwner returns (bool) {
+        operator = _newOperator;
+        return true;
+    }
+    
     function transferAnyBEP20(address _tokenAddress, address _to, uint256 _amount) public virtual onlyOwner returns (bool) {
         IBEP20(_tokenAddress).transfer(_to, _amount);
         return true;
@@ -129,5 +135,9 @@ contract LaqiracePayment is Ownable {
     
     function getReqFee() public view returns (uint256) {
         return reqFee;
+    }
+    
+    function getOperator() public view returns (address) {
+        return operator;
     }
 }
