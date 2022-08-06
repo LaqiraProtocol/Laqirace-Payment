@@ -21,22 +21,26 @@ contract LaqiracePayment is Ownable {
     mapping(address => bool) private quoteToken;
 
     address private paymentReceiver;
-    bool private nativeCurrencyPermit;
 
     event DepositToken(address player, address quoteToken, uint256 amount);
     event DepositNativeCurrency(address player, string curreny, uint256 amount);
     event WithdrawTokenRequest(address player, address quoteToken, uint256 amount);
     event WithdrawNativeRequest(address player, string currency, uint256 amount);
 
-    function depositToken(address _quoteToken, address _player, uint256 _amount) public {
+    function deposit(address _quoteToken, address _player, uint256 _amount) public payable returns (bool) {
         require(quoteToken[_quoteToken], 'Payment method is not allowed');
-        TransferHelper.safeTransferFrom(_quoteToken, _msgSender(), paymentReceiver, _amount);
+        
+        uint256 transferredAmount = msg.value;
+        if (_quoteToken == TransferHelper.ETH_ADDRESS) {
+            require(transferredAmount >= _amount, 'Insufficient paid amount');
+            uint256 diff = transferredAmount  - _amount;
+            if (diff > 0)
+                TransferHelper.safeTransferETH(_msgSender(), diff);
+        } else {
+            require(transferredAmount = 0, 'Invalid payment method');
+            TransferHelper.safeTransferFrom(_quoteToken, _msgSender(), paymentReceiver, _amount);
+        }
         emit DepositToken(_player, _quoteToken, _amount);
-    }
-
-    function depositNativeCurrency(address _player) public payable {
-        require(nativeCurrencyPermit, 'Payment method not allowed');
-        emit DepositNativeCurrency(_player, 'BNB', msg.value);
     }
 
     function withdrawTokenRequest(address _quoteToken, uint256 _amount) public {
