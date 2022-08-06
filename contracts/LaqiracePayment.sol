@@ -82,6 +82,7 @@ contract LaqiracePayment is Ownable {
     
     function confirmRequest(uint256 _reqNo) public returns (bool) {
         require(_msgSender() == operator || _msgSender() == owner(), 'Permission denied!');
+        require(withdrawReqs[_reqNo].isPending, 'Not a pending request');
         address asset = withdrawReqs[_reqNo].quoteToken;
         if (asset == TransferHelper.ETH_ADDRESS) {
             TransferHelper.safeTransferETH(withdrawReqs[_reqNo].player, withdrawReqs[_reqNo].amount);
