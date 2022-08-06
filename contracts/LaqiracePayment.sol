@@ -23,9 +23,7 @@ contract LaqiracePayment is Ownable {
     address private paymentReceiver;
 
     event DepositToken(address player, address quoteToken, uint256 amount);
-    event DepositNativeCurrency(address player, string curreny, uint256 amount);
-    event WithdrawTokenRequest(address player, address quoteToken, uint256 amount);
-    event WithdrawNativeRequest(address player, string currency, uint256 amount);
+    event WithdrawRequest(address player, address quoteToken, uint256 amount);
 
     function deposit(address _quoteToken, address _player, uint256 _amount) public payable returns (bool) {
         require(quoteToken[_quoteToken], 'Payment method is not allowed');
@@ -41,10 +39,12 @@ contract LaqiracePayment is Ownable {
             TransferHelper.safeTransferFrom(_quoteToken, _msgSender(), paymentReceiver, _amount);
         }
         emit DepositToken(_player, _quoteToken, _amount);
+        return true;
     }
 
-    function withdrawRequest(address _quoteToken, uint256 _amount) public {
-        emit WithdrawTokenRequest(_msgSender(), _quoteToken, _amount);
+    function withdrawRequest(address _quoteToken, uint256 _amount) public returns (bool) {
+        emit WithdrawRequest(_msgSender(), _quoteToken, _amount);
+        return true;
     }
 
     function addQuoteToken(address _quoteToken) public onlyOwner returns (bool) {
@@ -52,34 +52,24 @@ contract LaqiracePayment is Ownable {
         return true;
     }
 
-    function setNativePermit(bool _status) public onlyOwner returns (bool) {
-        nativeCurrencyPermit = _status;
-        return true;
-    }
-    
-    function getNativePermit() public view returns (bool) {
-        return nativeCurrencyPermit;
-    }
-
     function setPaymentReceiver(address _paymentReceiver) public onlyOwner returns (bool) {
         paymentReceiver = _paymentReceiver;
         return true;
     }
-
-    function getPaymentReceiver() public view returns (address) {
-        return paymentReceiver;
-    }
-
+    
     function transferAnyBEP20(address _tokenAddress, address _to, uint256 _amount) public virtual onlyOwner returns (bool) {
         IBEP20(_tokenAddress).transfer(_to, _amount);
         return true;
     }
-
+    
     function adminWithdrawal(uint256 _amount) public virtual onlyOwner {
         address payable _owner = payable(owner());
         _owner.transfer(_amount);
     }
 
+    function getPaymentReceiver() public view returns (address) {
+        return paymentReceiver;
+    }
 
     function checkQuoteToken(address _quoteToken) public view returns (bool) {
         return quoteToken[_quoteToken];
