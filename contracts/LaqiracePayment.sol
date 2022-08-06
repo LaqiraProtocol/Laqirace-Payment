@@ -42,6 +42,7 @@ contract LaqiracePayment is Ownable {
     event DepositToken(address player, address quoteToken, uint256 amount);
     event WithdrawRequest(address player, address quoteToken, uint256 amount, uint256 reqCounter);
     event RequestConfirmed(address player, address quoteToken, uint256 amount, uint256 reqCounter);
+    event RequestRejected(address player, address quoteToken, uint256 amount, uint256 reqCounter);
 
     function deposit(address _quoteToken, address _player, uint256 _amount) public payable returns (bool) {
         require(quoteToken[_quoteToken].isAvailable, 'Payment method is not allowed');
@@ -90,6 +91,15 @@ contract LaqiracePayment is Ownable {
         withdrawReqs[_reqNo].isPending = false;
         delUintFromArray(_reqNo, pendingReqs);
         emit RequestConfirmed(withdrawReqs[_reqNo].player, withdrawReqs[_reqNo].quoteToken, withdrawReqs[_reqNo].amount, _reqNo);
+        return true;
+    }
+    
+    function rejectRequest(uint256 _reqNo) public returns (bool) {
+        require(_msgSender() == operator || _msgSender() == owner(), 'Permission denied!');
+        require(withdrawReqs[_reqNo].isPending, 'Not a pending request');
+        withdrawReqs[_reqNo].isPending = false;
+        delUintFromArray(_reqNo, pendingReqs);
+        emit RequestRejected(withdrawReqs[_reqNo].player, withdrawReqs[_reqNo].quoteToken, withdrawReqs[_reqNo].amount, _reqNo);
         return true;
     }
 
@@ -159,7 +169,7 @@ contract LaqiracePayment is Ownable {
     function delUintFromArray(
         uint256 _element,
         uint256[] storage array
-    ) private virtual {
+    ) internal virtual {
         // delete the element
         uint256 len = array.length;
         uint256 j = 0;
