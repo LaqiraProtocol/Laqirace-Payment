@@ -18,7 +18,12 @@ interface IBEP20 {
 }
 
 contract LaqiracePayment is Ownable {
-    mapping(address => bool) private quoteToken;
+    struct assetStatus {
+        bool isAvailable;
+        uint256 minAmount;
+    }
+
+    mapping(address => assetStatus) private quoteToken;
     mapping(uint256 => bool) private pendingRequests;
 
     address private paymentReceiver;
@@ -29,7 +34,7 @@ contract LaqiracePayment is Ownable {
     event WithdrawRequest(address player, address quoteToken, uint256 amount, uint256 reqCounter);
 
     function deposit(address _quoteToken, address _player, uint256 _amount) public payable returns (bool) {
-        require(quoteToken[_quoteToken], 'Payment method is not allowed');
+        require(quoteToken[_quoteToken].isAvailable, 'Payment method is not allowed');
         
         uint256 transferredAmount = msg.value;
         if (_quoteToken == TransferHelper.ETH_ADDRESS) {
@@ -46,7 +51,8 @@ contract LaqiracePayment is Ownable {
     }
 
     function withdrawRequest(address _quoteToken, uint256 _amount) public returns (bool) {
-        require(quoteToken[_quoteToken], 'Asset is not allowed');
+        require(quoteToken[_quoteToken].isAvailable, 'Asset is not allowed');
+        require(_amount >= quoteToken[_quoteToken].minAmount, 'Amount is lower than minimum required');
         reqCounter++;
         pendingRequests[reqCounter] = true;
         pendingReqs.push(reqCounter);
@@ -54,8 +60,9 @@ contract LaqiracePayment is Ownable {
         return true;
     }
 
-    function addQuoteToken(address _quoteToken) public onlyOwner returns (bool) {
-        quoteToken[_quoteToken] = true;
+    function addQuoteToken(address _quoteToken, uint256 _minAmount) public onlyOwner returns (bool) {
+        quoteToken[_quoteToken].isAvailable = true;
+        quoteToken[_quoteToken].minAmount = _minAmount;
         return true;
     }
 
@@ -78,7 +85,7 @@ contract LaqiracePayment is Ownable {
         return paymentReceiver;
     }
 
-    function checkQuoteToken(address _quoteToken) public view returns (bool) {
-        return quoteToken[_quoteToken];
+    function checkQuoteToken(address _quoteToken) public view returns (bool, uint256) {
+        return (quoteToken[_quoteToken].isAvailable, quoteToken[_quoteToken].minAmount);
     }
 }
