@@ -122,7 +122,7 @@ contract LaqiracePayment is Ownable {
         return true;
     }
 
-    function setPaymentReceiver(address _paymentReceiver) public onlyOwner returns (bool) {
+    function updatePaymentReceiver(address _paymentReceiver) public onlyOwner returns (bool) {
         paymentReceiver = _paymentReceiver;
         return true;
     }
