@@ -18,20 +18,20 @@ interface IBEP20 {
 }
 
 contract LaqiracePayment is Ownable {
-    struct assetStatus {
+    struct AssetStatus {
         bool isAvailable;
         uint256 minAmount;
     }
     
-    struct reqStatus {
+    struct ReqStatus {
         bool isPending;
         address player;
         address quoteToken;
         uint256 amount;
     }
 
-    mapping(address => assetStatus) private quoteToken;
-    mapping(uint256 => reqStatus) private withdrawReqs;
+    mapping(address => AssetStatus) private quoteToken;
+    mapping(uint256 => ReqStatus) private withdrawReqs;
 
     address private paymentReceiver;
     uint256 private reqCounter;
@@ -157,7 +157,7 @@ contract LaqiracePayment is Ownable {
         return paymentReceiver;
     }
 
-    function checkQuoteToken(address _quoteToken) public view returns (assetStatus memory) {
+    function checkQuoteToken(address _quoteToken) public view returns (AssetStatus memory) {
         return quoteToken[_quoteToken];
     }
     
@@ -165,7 +165,7 @@ contract LaqiracePayment is Ownable {
         return pendingReqs;
     }
     
-    function getReqStatus(uint256 _reqNo) public view returns (reqStatus memory) {
+    function getReqStatus(uint256 _reqNo) public view returns (ReqStatus memory) {
         return withdrawReqs[_reqNo];
     }
     
